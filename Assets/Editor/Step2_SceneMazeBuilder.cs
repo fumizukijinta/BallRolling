@@ -28,6 +28,7 @@ namespace BallRolling.EditorTools
 
             BuildFloor(maze, parameters, root.transform);
             BuildWalls(maze, parameters, root.transform);
+            BuildCeiling(maze, parameters, root.transform);
             BuildMarkers(maze, parameters, root.transform);
             FrameCamera(maze, parameters);
 
@@ -103,6 +104,17 @@ namespace BallRolling.EditorTools
                 ? new Vector3(p.WallThickness, p.WallHeight, p.CellSize + p.WallThickness)
                 : new Vector3(p.CellSize + p.WallThickness, p.WallHeight, p.WallThickness);
             wall.GetComponent<Renderer>().sharedMaterial = material;
+        }
+
+        private static void BuildCeiling(MazeModel maze, Step2_MazeBuildParameters p, Transform root)
+        {
+            // 透明な天井（コライダーのみ）: 跳ねた玉が壁を越えられないよう下部を壁上端より低く抑える
+            var ceiling = new GameObject("Ceiling");
+            ceiling.transform.SetParent(root, false);
+            ceiling.transform.localPosition = new Vector3(
+                maze.Width * p.CellSize / 2f, p.WallHeight - 0.2f, maze.Height * p.CellSize / 2f);
+            var box = ceiling.AddComponent<BoxCollider>();
+            box.size = new Vector3(maze.Width * p.CellSize + 1f, 0.2f, maze.Height * p.CellSize + 1f);
         }
 
         private static void BuildMarkers(MazeModel maze, Step2_MazeBuildParameters p, Transform root)

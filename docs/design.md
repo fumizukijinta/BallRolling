@@ -66,6 +66,8 @@ Goal / TimeUp --Space--> Regenerate （壁破棄→迷路再生成→WaitingToSt
 ### ItemPickup
 - `OnTriggerEnter`（玉のタグ判定）→ 取得フラグをGameControllerへ、アイテム消滅
 
+- 壁の高さデフォルト1.2（玉直径0.8より十分高く飛び越えを防ぐ）。傾け時のバウンドで壁越えしないよう、迷路全体に**透明な天井（BoxColliderのみ、下面=壁上端-0.3）**を配置。玉の跳ね返りは0.02に抑制
+
 ### 玉（Ball）
 - **Sphere** + Rigidbody（mass 1, linearDamping 0.1, angularDamping 0.05）+ SphereCollider
 - PhysicMaterial: 摩擦0.6 / バウンス0.1（調整余地）

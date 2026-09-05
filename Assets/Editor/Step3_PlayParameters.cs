@@ -12,7 +12,7 @@ namespace BallRolling.EditorTools
         public float BallDrag = 0.05f;
         public float BallAngularDrag = 0.05f;
         public float Friction = 0.35f;
-        public float Bounciness = 0.1f;
+        public float Bounciness = 0.02f;
         public float GravityScale = 2f;
         public float MaxLinearSpeed = 12f;
         public float MaxAngularSpeed = 25f;

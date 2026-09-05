@@ -12,7 +12,7 @@ namespace BallRolling.EditorTools
         public int Seed = 42;
         public bool IsRandomSeed = true;
         public float CellSize = 1f;
-        public float WallHeight = 0.5f;
+        public float WallHeight = 1.2f;
         public float WallThickness = 0.2f;
         public float FloorThickness = 0.5f;
         public Color WallColor = new Color(0.75f, 0.75f, 0.8f);

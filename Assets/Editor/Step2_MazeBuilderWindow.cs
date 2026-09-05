@@ -34,7 +34,7 @@ namespace BallRolling.EditorTools
             EditorGUILayout.Space();
             EditorGUILayout.LabelField("形状", EditorStyles.boldLabel);
             _parameters.CellSize = EditorGUILayout.Slider("セルサイズ", _parameters.CellSize, 0.5f, 3f);
-            _parameters.WallHeight = EditorGUILayout.Slider("壁の高さ", _parameters.WallHeight, 0.1f, 2f);
+            _parameters.WallHeight = EditorGUILayout.Slider("壁の高さ", _parameters.WallHeight, 0.8f, 2.5f);
             _parameters.WallThickness = EditorGUILayout.Slider("壁の厚さ", _parameters.WallThickness, 0.05f, 0.5f);
             _parameters.FloorThickness = EditorGUILayout.Slider("床の厚さ", _parameters.FloorThickness, 0.05f, 1f);
 
