@@ -25,3 +25,9 @@ unity build .               # プロジェクトをビルド
 - ゲームplay用スクリプトは `Assets/Scripts/` に配置する
 - テストコードは `Assets/Tests/EditMode/`・`Assets/Tests/PlayMode/` に配置する
 - エディター拡張は `Assets/Editor/` に配置する
+
+## バージョン管理の運用
+
+- 画像・動画・音声（とその .meta）は容量対策で**コミットしない**（.gitignore で除外済み）
+- 3Dモデル（fbx等）・フォント・ライブラリ（dll等）は Git LFS で管理
+- メディアファイルはgit外で別途バックアップが必要（他マシンでクローンした場合は手動配置）
