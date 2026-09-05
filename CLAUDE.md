@@ -20,6 +20,13 @@ unity projects verify .     # ビルドを壊す整合性問題をチェック
 unity build .               # プロジェクトをビルド
 ```
 
+## 開発セッション開始時の手順
+
+1. `unity skill install claude-code --local` — スキルを最新化
+2. `unity open .` — エディター起動（初回やLibrary再生成後はインポートで数分かかる場合あり）
+3. `unity status` で `ready` を確認（Pipelineサーバー起動まで待つ）
+4. `unity command editor_status` で通信確認（playMode/compiling の状態も見える）
+
 ## MCP連携
 
 - `unity-editor-mcp`（ユーザースコープ、`~/.claude.json`）が `unity mcp` サーバーを登録済み
