@@ -26,6 +26,20 @@ unity build .               # プロジェクトをビルド
 - テストコードは `Assets/Tests/EditMode/`・`Assets/Tests/PlayMode/` に配置する
 - エディター拡張は `Assets/Editor/` に配置する
 
+### 命名規則（Unity公式ガイドライン準拠）
+
+- **PascalCase**: クラス・構造体・列挙型・メソッド・publicフィールド・プロパティ・定数
+- **camelCase**: ローカル変数・メソッドパラメータ・privateフィールド（`_camelCase` プレフィックスを使用）
+- 変数名は**名詞**、boolは動詞接頭辞（`isDead` / `hasKey`）、boolを返すメソッドは疑問形（`IsGameOver()`）
+- メソッド名は**動詞句**で始める（`GetDirection` / `FindTarget`）
+- インターフェースは `I` + 形容詞（`IDamageable`）
+- 列挙型は単数形の名詞（`WeaponType`）。`[Flags]` 付きのみ複数形
+- イベントは動詞句: 直前は現在分詞（`OpeningDoor`）、直後は過去分詞（`DoorOpened`）。発火メソッドは `On` プレフィックス
+- **MonoBehaviourは1ファイル1クラス、ファイル名 = クラス名**
+- ハンガリアン記法・略語は使わない。冗長な名前も避ける（`Player`クラス内なら `Score` でよく `PlayerScore` は不要）
+- 名前空間はPascalCaseでフォルダ構造を反映（`BallRolling.Gameplay` 等）
+- `= 0` / `= null` 等の冗長な初期化子は書かない。アクセス修飾子は明示する
+
 ## バージョン管理の運用
 
 - 画像・動画・音声（とその .meta）は容量対策で**コミットしない**（.gitignore で除外済み）
