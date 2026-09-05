@@ -20,6 +20,12 @@ unity projects verify .     # ビルドを壊す整合性問題をチェック
 unity build .               # プロジェクトをビルド
 ```
 
+## MCP連携
+
+- `unity-editor-mcp`（ユーザースコープ、`~/.claude.json`）が `unity mcp` サーバーを登録済み
+- エディター起動中は Pipeline コマンドが MCP ツール（`mcp__unity-editor-mcp__*`）として自動公開される
+- 設定変更は `unity mcp configure claude-code`、一覧は `claude mcp list` で確認
+
 ## コーディング規約
 
 - ゲームplay用スクリプトは `Assets/Scripts/` に配置する
