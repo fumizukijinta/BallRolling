@@ -2,6 +2,7 @@
     "name": "BallRolling.Editor",
     "rootNamespace": "BallRolling.Editor",
     "references": [
+        "BallRolling",
         "Unity.Pipeline",
         "Unity.Pipeline.Editor"
     ],
