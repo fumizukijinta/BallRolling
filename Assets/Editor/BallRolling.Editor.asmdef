@@ -1,0 +1,19 @@
+{
+    "name": "BallRolling.Editor",
+    "rootNamespace": "BallRolling.Editor",
+    "references": [
+        "Unity.Pipeline",
+        "Unity.Pipeline.Editor"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
