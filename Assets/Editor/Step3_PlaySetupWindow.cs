@@ -22,6 +22,7 @@ namespace BallRolling.EditorTools
 
             EditorGUILayout.LabelField("玉の物理", EditorStyles.boldLabel);
             _parameters.GravityScale = EditorGUILayout.Slider("重力スケール (1=標準)", _parameters.GravityScale, 1f, 4f);
+            _parameters.MaxLinearSpeed = EditorGUILayout.Slider("最高速度 (m/s)", _parameters.MaxLinearSpeed, 4f, 20f);
             _parameters.BallSize = EditorGUILayout.Slider("玉のサイズ", _parameters.BallSize, 0.3f, 1f);
             _parameters.BallMass = EditorGUILayout.Slider("質量", _parameters.BallMass, 0.1f, 5f);
             _parameters.BallDrag = EditorGUILayout.Slider("空気抵抗 (Drag)", _parameters.BallDrag, 0f, 2f);

@@ -97,7 +97,8 @@ namespace BallRolling.EditorTools
             var wall = GameObject.CreatePrimitive(PrimitiveType.Cube);
             wall.name = name;
             wall.transform.SetParent(parent, false);
-            wall.transform.localPosition = position;
+            // 下端を床に0.1だけめり込ませ、壁と床の接縫（すり抜きやすい縁）を消す
+            wall.transform.localPosition = position - new Vector3(0f, 0.1f, 0f);
             wall.transform.localScale = isVertical
                 ? new Vector3(p.WallThickness, p.WallHeight, p.CellSize + p.WallThickness)
                 : new Vector3(p.CellSize + p.WallThickness, p.WallHeight, p.WallThickness);

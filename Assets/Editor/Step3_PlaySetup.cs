@@ -28,6 +28,7 @@ namespace BallRolling.EditorTools
             AttachBoardController(p, root);
             AttachCameraToBoard(root.transform);
             Physics.gravity = new Vector3(0f, -9.81f * p.GravityScale, 0f);
+            Time.fixedDeltaTime = 0.01f; // 物理ステップを細かく（すり抜け・爆発抑制）
 
             EditorSceneManager.MarkSceneDirty(SceneManager.GetActiveScene());
             return ball;
@@ -57,6 +58,11 @@ namespace BallRolling.EditorTools
             rigidbody.interpolation = RigidbodyInterpolation.Interpolate;
             rigidbody.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
             ball.GetComponent<Collider>().sharedMaterial = GetOrCreateBallPhysicsMaterial(p);
+
+            var limiter = ball.GetComponent<BallSpeedLimiter>();
+            if (limiter == null)
+                ball.AddComponent<BallSpeedLimiter>();
+            ball.GetComponent<BallSpeedLimiter>().Configure(p.MaxLinearSpeed, p.MaxAngularSpeed);
 
             Undo.RegisterCreatedObjectUndo(ball, "Step3: Spawn Ball");
             return ball;
