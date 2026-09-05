@@ -45,6 +45,7 @@ unity build .               # プロジェクトをビルド
 - 画像・動画・音声（とその .meta）は容量対策で**コミットしない**（.gitignore で除外済み）
 - 3Dモデル（fbx等）・フォント・ライブラリ（dll等）は Git LFS で管理
 - メディアファイルはgit外で別途バックアップが必要（他マシンでクローンした場合は手動配置）
+- `.claude/skills/` はgit管理外。開発開始前に `unity skill install claude-code --local` で最新版を導入してから作業する
 
 ## Unityアセット操作の規約
 
