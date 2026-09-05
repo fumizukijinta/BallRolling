@@ -67,7 +67,7 @@ Goal / TimeUp --Space--> Regenerate （壁破棄→迷路再生成→WaitingToSt
 - `OnTriggerEnter`（玉のタグ判定）→ 取得フラグをGameControllerへ、アイテム消滅
 
 ### 玉（Ball）
-- Cube + Rigidbody（mass 1, drag 0.1, angularDrag 0.05）+ BoxCollider
+- **Sphere** + Rigidbody（mass 1, linearDamping 0.1, angularDamping 0.05）+ SphereCollider
 - PhysicMaterial: 摩擦0.6 / バウンス0.1（調整余地）
 - ゴール判定: 玉のY座標がボード面より一定下で、かつXZが出口セル範囲内
 

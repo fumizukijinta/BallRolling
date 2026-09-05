@@ -41,7 +41,7 @@ namespace BallRolling.EditorTools
             // 迷路モデルの入り口 = (0,0)。セル中心は +0.5
             var entrance = new Vector3(0.5f, p.BallSpawnHeight, 0.5f);
 
-            var ball = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            var ball = GameObject.CreatePrimitive(PrimitiveType.Sphere);
             ball.name = BallName;
             ball.transform.SetParent(root, false);
             ball.transform.localPosition = entrance;
