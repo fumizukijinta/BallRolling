@@ -36,6 +36,13 @@ score = (t <= 60 ? 2 : t <= 120 ? 1 : 0) + (item ? 1 : 0)   // 最大3
 stars = "★"×score + "☆"×(3-score)
 ```
 
+## エディターツール（Assets/Editor/、ユーザー制約: EditorWindowベース）
+
+- `MazeBuilderWindow`（EditorWindow）: パラメータUI（迷路サイズ・シード・色・玉物理・アイテム設定）＋「迷路生成」「再生成」ボタン
+- 生成・変更は **Undo対応**（`Undo.RegisterCreatedObjectUndo` / `Undo.RecordObject`）→ Ctrl+Zで戻せる
+- シーン変更は **`EditorSceneManager.MarkSceneDirty` + `EditorUtility.SetDirty`** で確実に保存対象化
+- 目的: ユーザーが後からパラメータを調整して迷路を再現・差し替えできるようにする
+
 ## Unity側（MonoBehaviour）
 
 ### GameController（状態マシン・単一責任の指揮）
@@ -54,7 +61,7 @@ Goal / TimeUp --Space--> Regenerate （壁破棄→迷路再生成→WaitingToSt
 ### MazeBuilder
 - `Cell[,]`から壁を生成: 1セル=1ユニット、壁=BoxCollider付きCube、板=グリッド単位Cube（出口セルは穴=Cubeなし、入り口も同様）
 - `Build(MazeModel)` / `Clear()`（再生成用）
-- アイテム: 行き止まり座標から乱数で1箇所選択し回転する小Cube+トリガー
+- アイテム: 行き止まり座標から**入り口・出口を除いて**乱数で1箇所選択し回転する小Cube+トリガー
 
 ### ItemPickup
 - `OnTriggerEnter`（玉のタグ判定）→ 取得フラグをGameControllerへ、アイテム消滅
