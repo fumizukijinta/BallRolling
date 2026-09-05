@@ -80,6 +80,21 @@ namespace BallRolling.EditorTools
             Undo.RecordObject(controller, "Step3: Configure BoardController");
             controller.Configure(p.MaxTiltAngle, p.TiltSpeed);
             EditorUtility.SetDirty(controller);
+
+            // 回転するボードにはKinematic Rigidbodyが必須。Rigidbodyなしの静的コライダーを
+            // Transformで回転すると接触計算が不正確になり、玉が床をすり抜ける原因になる。
+            var rootBody = root.GetComponent<Rigidbody>();
+            if (rootBody == null)
+            {
+                Undo.AddComponent<Rigidbody>(root);
+                rootBody = root.GetComponent<Rigidbody>();
+            }
+
+            Undo.RecordObject(rootBody, "Step3: Configure Board Rigidbody");
+            rootBody.isKinematic = true;
+            rootBody.useGravity = false;
+            rootBody.interpolation = RigidbodyInterpolation.Interpolate;
+            EditorUtility.SetDirty(rootBody);
         }
 
         private static void AttachCameraToBoard(Transform root)
