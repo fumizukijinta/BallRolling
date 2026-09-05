@@ -8,6 +8,8 @@
 [Uu]ser[Ss]ettings/
 MemoryCaptures/
 Recordings/
+# Assets/ 内に生成される Logs フォルダーの meta（capture_game_view 等の保存先）
+[Ll]ogs.meta
 
 # アセットメタデータは必要に応じてコメントアウトを外す
 # /[Aa]ssets/AssetStoreTools*
