@@ -108,13 +108,26 @@ namespace BallRolling.EditorTools
 
         private static void BuildCeiling(MazeModel maze, Step2_MazeBuildParameters p, Transform root)
         {
-            // 透明な天井（コライダーのみ）: 跳ねた玉が壁を越えられないよう下部を壁上端より低く抑える
-            var ceiling = new GameObject("Ceiling");
-            ceiling.transform.SetParent(root, false);
-            ceiling.transform.localPosition = new Vector3(
-                maze.Width * p.CellSize / 2f, p.WallHeight - 0.2f, maze.Height * p.CellSize / 2f);
-            var box = ceiling.AddComponent<BoxCollider>();
-            box.size = new Vector3(maze.Width * p.CellSize + 1f, 0.2f, maze.Height * p.CellSize + 1f);
+            // 透明な天井（コライダーのみ）: 跳ねた玉が壁を越えられないよう下部を壁上端より低く抑える。
+            // 入り口セルの上だけ穴を開け、玉が上空から落下して入れるようにする。
+            var ceilingParent = new GameObject("Ceiling");
+            ceilingParent.transform.SetParent(root, false);
+
+            for (var y = 0; y < maze.Height; y++)
+            {
+                for (var x = 0; x < maze.Width; x++)
+                {
+                    if (x == maze.Entrance.x && y == maze.Entrance.y)
+                        continue; // 入り口セルの上は落下経路として開ける
+
+                    var tile = new GameObject($"Ceiling_{x}_{y}");
+                    tile.transform.SetParent(ceilingParent.transform, false);
+                    tile.transform.localPosition = new Vector3(
+                        (x + 0.5f) * p.CellSize, p.WallHeight - 0.2f, (y + 0.5f) * p.CellSize);
+                    var box = tile.AddComponent<BoxCollider>();
+                    box.size = new Vector3(p.CellSize, 0.2f, p.CellSize);
+                }
+            }
         }
 
         private static void BuildMarkers(MazeModel maze, Step2_MazeBuildParameters p, Transform root)
