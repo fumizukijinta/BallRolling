@@ -6,6 +6,7 @@
 
 - Unity 6（6000.6.0f1）+ Universal 3D (URP) テンプレートで作成した玉転がしゲーム
 - ビルドターゲット: StandaloneWindows64
+- **ゲーム仕様・設計: `docs/requirements.md`（要件）と `docs/design.md`（詳細設計）を必ず参照。実装変更時は設計書も更新する**
 - バージョン管理: 未導入（git 導入時にルートの `.gitignore` を使用）
 
 ## よく使うコマンド
