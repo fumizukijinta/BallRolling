@@ -9,10 +9,11 @@ namespace BallRolling.EditorTools
     {
         public float BallSize = 0.8f;
         public float BallMass = 1f;
-        public float BallDrag = 0.1f;
+        public float BallDrag = 0.05f;
         public float BallAngularDrag = 0.05f;
-        public float Friction = 0.6f;
+        public float Friction = 0.35f;
         public float Bounciness = 0.1f;
+        public float GravityScale = 2f;
         public Color BallColor = new Color(0.2f, 0.45f, 0.95f);
         public float MaxTiltAngle = 15f;
         public float TiltSpeed = 5f;

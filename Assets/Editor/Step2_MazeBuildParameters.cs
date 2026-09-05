@@ -13,8 +13,8 @@ namespace BallRolling.EditorTools
         public bool IsRandomSeed = true;
         public float CellSize = 1f;
         public float WallHeight = 0.5f;
-        public float WallThickness = 0.15f;
-        public float FloorThickness = 0.2f;
+        public float WallThickness = 0.2f;
+        public float FloorThickness = 0.5f;
         public Color WallColor = new Color(0.75f, 0.75f, 0.8f);
         public Color FloorColor = new Color(0.55f, 0.6f, 0.65f);
         public Color EntranceColor = new Color(0.2f, 0.85f, 0.3f);
