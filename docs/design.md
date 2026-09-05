@@ -59,7 +59,7 @@ Goal / TimeUp --Space--> Regenerate （壁破棄→迷路再生成→WaitingToSt
 - `MazeRoot`（ボード全体の親）を回転。**カメラはMazeRootの子**（正対維持）
 
 ### MazeBuilder
-- `Cell[,]`から壁を生成: 1セル=1ユニット、壁=BoxCollider付きCube、板=グリッド単位Cube（出口セルは穴=Cubeなし、入り口も同様）
+- `Cell[,]`から壁を生成: 1セル=1ユニット、壁=BoxCollider付きCube、板=グリッド単位Cube。**出口セルのみ穴（Cubeなし）**。入り口セルは床あり（玉が入り口上に落下して着地し、迷路を転がる）
 - `Build(MazeModel)` / `Clear()`（再生成用）
 - アイテム: 行き止まり座標から**入り口・出口を除いて**乱数で1箇所選択し回転する小Cube+トリガー
 

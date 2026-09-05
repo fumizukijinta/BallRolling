@@ -18,7 +18,10 @@ namespace BallRolling.EditorTools
         {
             var oldRoot = GameObject.Find(RootName);
             if (oldRoot != null)
+            {
+                DetachCameraFrom(oldRoot.transform); // MazeRoot削除でカメラが消えないよう先に退避
                 Undo.DestroyObjectImmediate(oldRoot);
+            }
 
             var root = new GameObject(RootName);
             Undo.RegisterCreatedObjectUndo(root, "Step2: Generate Maze");
@@ -44,8 +47,8 @@ namespace BallRolling.EditorTools
                 for (var x = 0; x < maze.Width; x++)
                 {
                     var position = new Vector2Int(x, y);
-                    if (position == maze.Entrance || position == maze.Exit)
-                        continue; // 入り口・出口セルは穴にする
+                    if (position == maze.Exit)
+                        continue; // 出口セルのみ穴にする（入り口は床あり=玉が着地して迷路に入る）
 
                     var cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
                     cube.name = $"Floor_{x}_{y}";
@@ -124,11 +127,23 @@ namespace BallRolling.EditorTools
             Object.DestroyImmediate(marker.GetComponent<Collider>());
         }
 
+        private static void DetachCameraFrom(Transform root)
+        {
+            var camera = root.GetComponentInChildren<Camera>();
+            if (camera != null)
+                camera.transform.SetParent(null, true); // ワールド位置維持で親から外す
+        }
+
         private static void FrameCamera(MazeModel maze, Step2_MazeBuildParameters p)
         {
             var camera = Camera.main;
             if (camera == null)
-                return;
+            {
+                var cameraObject = new GameObject("Main Camera", typeof(Camera), typeof(AudioListener));
+                cameraObject.tag = "MainCamera";
+                Undo.RegisterCreatedObjectUndo(cameraObject, "Step2: Create Main Camera");
+                camera = cameraObject.GetComponent<Camera>();
+            }
 
             Undo.RecordObject(camera.transform, "Step2: Frame Maze Camera");
             var centerX = maze.Width * p.CellSize / 2f;
