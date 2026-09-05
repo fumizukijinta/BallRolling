@@ -1,0 +1,43 @@
+# Unity が生成するフォルダー・ファイル
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+[Ll]ogs/
+[Uu]ser[Ss]ettings/
+MemoryCaptures/
+Recordings/
+
+# アセットメタデータは必要に応じてコメントアウトを外す
+# /[Aa]ssets/AssetStoreTools*
+
+# Visual Studio / Rider のキャッシュ
+.vs/
+.idea/
+*.csproj
+*.sln
+*.suo
+*.tmp
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.mdb
+sysinfo.txt
+*.stackdump
+
+# Unity 生成ファイル
+*.apk
+*.aab
+*.unitypackage
+*.app
+
+# crashlytics
+crashlytics-build.properties
+sysinfo.txt
+
+# Claude Code ローカル設定（マシン固有）
+.claude/settings.local.json
