@@ -107,3 +107,5 @@ sysinfo.txt
 
 # Claude Code ローカル設定（マシン固有）
 .claude/settings.local.json
+# エージェントスキル（unity skill install で最新版を都度生成するため管理外）
+.claude/skills/
