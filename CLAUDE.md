@@ -31,3 +31,9 @@ unity build .               # プロジェクトをビルド
 - 画像・動画・音声（とその .meta）は容量対策で**コミットしない**（.gitignore で除外済み）
 - 3Dモデル（fbx等）・フォント・ライブラリ（dll等）は Git LFS で管理
 - メディアファイルはgit外で別途バックアップが必要（他マシンでクローンした場合は手動配置）
+
+## Unityアセット操作の規約
+
+- 新規ファイル作成時に **.meta は手書きしない**。Unityエディターの自動生成を待つ（フォーカスが無い場合は `unity command recompile` で AssetDatabase 更新をトリガー）
+- 生成ファイルと .meta は**セットでコミット**する（.meta 欠落は GUID 再生成→参照切れの原因）
+- ライブエディターが接続中のときは `.unity` / `.prefab` / `.asset` を直接編集せず Pipeline コマンド（`create_gameobject` 等）で操作する
