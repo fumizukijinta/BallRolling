@@ -12,6 +12,15 @@ model: glm-5.3-flash
 - `docs/design.md` のテスト計画に基づき EditMode / PlayMode テストを作成する
 - `unity command run_tests --mode editor`（または `unity test .`）でテストを実行する
 - 失敗テストを分析し、**「実装バグ」か「テスト側の前提誤り」かを切り分けた報告**をする
+- **プレイモードでのスモークテスト（統合動作確認）**: design.md の「動作確認手順」に沿ってエディターを実機操作し、UI表示・物理挙動・状態遷移を確認する
+
+## スモークテストの手順書（判明済みの落とし穴）
+
+1. `editor_play` → 数秒待つ → eval でUIテキスト・玉の状態を実値検証（`_timerText`/`_messageText` はSerializedObject経由で読む）
+2. **玉の転送は必ず `Rigidbody.position` で行う**（`transform.localPosition` の直接書き換えでは物理ボディが移動しない）
+3. **内部メソッドの反射呼び出しは公開メソッド相当（`StartPlay`/`RestartGame` 等）を経由する**（内部処理だけ呼ぶとUI更新等がスキップされて偽の失敗に見える）
+4. **フレーム停止（frameCount不変）時はUnityウィンドウのフォーカスをユーザーに依頼する**（autotickはプレイモード中は当てにできない）
+5. 確認後は必ず `editor_stop` でプレイモードを抜ける
 
 ## 必ず守ること
 

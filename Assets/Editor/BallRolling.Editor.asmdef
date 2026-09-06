@@ -4,7 +4,8 @@
     "references": [
         "BallRolling",
         "Unity.Pipeline",
-        "Unity.Pipeline.Editor"
+        "Unity.Pipeline.Editor",
+        "UnityEngine.UI"
     ],
     "includePlatforms": [
         "Editor"

@@ -12,6 +12,7 @@ namespace BallRolling.Gameplay
 
         private Rigidbody _rigidbody;
         private Quaternion _initialRotation;
+        private bool _isInputEnabled = true;
 
         private void Awake()
         {
@@ -25,6 +26,9 @@ namespace BallRolling.Gameplay
 
         private void FixedUpdate()
         {
+            if (!_isInputEnabled)
+                return;
+
             var keyboard = Keyboard.current;
             if (keyboard == null)
                 return;
@@ -46,6 +50,18 @@ namespace BallRolling.Gameplay
         {
             _maxTiltAngle = maxTiltAngle;
             _tiltSpeed = tiltSpeed;
+        }
+
+        /// <summary>矢印キー入力の有効/無効を切り替える（待機中・結果表示中はボードを動かさない）。</summary>
+        public void SetInputEnabled(bool isEnabled)
+        {
+            _isInputEnabled = isEnabled;
+        }
+
+        /// <summary>ボードの姿勢を初期状態へ戻す。再開時のSlerp目標も初期姿勢に戻る。</summary>
+        public void ResetRotation()
+        {
+            _rigidbody.MoveRotation(_initialRotation);
         }
     }
 }
