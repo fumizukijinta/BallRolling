@@ -33,7 +33,7 @@ namespace BallRolling.Gameplay
 
             // 遅延解決: 生成経路（エディター生成/ランタイム再生成）がGameControllerを知らないため取得時に探す
             if (_controller == null)
-                _controller = FindFirstObjectByType<GameController>();
+                _controller = FindAnyObjectByType<GameController>();
             if (_controller != null)
                 _controller.NotifyItemPicked();
 

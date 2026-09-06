@@ -112,6 +112,8 @@ namespace BallRolling.Gameplay
         {
             RegenerateMaze();
             _loop.Restart();
+            if (_ball != null)
+                _ball.SetActive(false); // 待機中は玉を隠す（TimeUp経由ではStartPlay時の表示が残るため）
             SetBoardInputEnabled(false);
             ApplyWaitingUi();
         }
