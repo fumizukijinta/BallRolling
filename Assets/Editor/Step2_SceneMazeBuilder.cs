@@ -1,4 +1,5 @@
 using System.IO;
+using BallRolling.Gameplay;
 using BallRolling.Gameplay.Logic;
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -12,6 +13,9 @@ namespace BallRolling.EditorTools
     {
         public const string RootName = "MazeRoot";
         private const string MaterialFolder = "Assets/Art/Materials";
+        private const float DefaultItemSize = 0.3f;
+        private const float DefaultItemLocalY = 0.35f;
+        private static readonly Color DefaultItemColor = new Color(1f, 0.8f, 0.1f);
 
         /// <summary>迷路を生成してシーンに配置する。既存のMazeRootはUndo可能な形で削除される。</summary>
         public static GameObject Build(MazeModel maze, Step2_MazeBuildParameters parameters)
@@ -30,6 +34,7 @@ namespace BallRolling.EditorTools
             BuildWalls(maze, parameters, root.transform);
             BuildCeiling(maze, parameters, root.transform);
             BuildMarkers(maze, parameters, root.transform);
+            BuildItem(maze, parameters, root.transform);
             FrameCamera(maze, parameters);
 
             EditorSceneManager.MarkSceneDirty(SceneManager.GetActiveScene());
@@ -98,7 +103,7 @@ namespace BallRolling.EditorTools
             var wall = GameObject.CreatePrimitive(PrimitiveType.Cube);
             wall.name = name;
             wall.transform.SetParent(parent, false);
-            // 下端を床に0.1だけめり込ませ、壁と床の接縫（すり抜きやすい縁）を消す
+            // 下端を床に0.1だけめり込ませ、壁と床の接縫（すり抜けやすい縁）を消す
             wall.transform.localPosition = position - new Vector3(0f, 0.1f, 0f);
             wall.transform.localScale = isVertical
                 ? new Vector3(p.WallThickness, p.WallHeight, p.CellSize + p.WallThickness)
@@ -151,6 +156,25 @@ namespace BallRolling.EditorTools
             marker.GetComponent<Renderer>().sharedMaterial = material;
             // 視認用マーカーのため当たり判定は持たせない
             Object.DestroyImmediate(marker.GetComponent<Collider>());
+        }
+
+        /// <summary>行き止まりにアイテムを1つ生成する（生成ロジックは MazeBuilder.BuildItem と共有。Undo登録のみこちらで行う）。</summary>
+        private static void BuildItem(MazeModel maze, Step2_MazeBuildParameters p, Transform root)
+        {
+            var geometry = new MazeGeometry
+            {
+                CellSize = p.CellSize,
+                WallHeight = p.WallHeight,
+                WallThickness = p.WallThickness,
+                FloorThickness = p.FloorThickness
+            };
+            var material = GetOrCreateMaterial("ItemGold", DefaultItemColor);
+            var builder = new MazeBuilder();
+            // アイテムのシードは迷路シードと独立の乱数（要件: ランダム配置）
+            var item = builder.BuildItem(maze, geometry, root, DefaultItemSize, DefaultItemLocalY,
+                material, UnityEngine.Random.Range(int.MinValue, int.MaxValue));
+            if (item != null)
+                Undo.RegisterCreatedObjectUndo(item.transform.parent.gameObject, "Step2: Build Item");
         }
 
         private static void DetachCameraFrom(Transform root)

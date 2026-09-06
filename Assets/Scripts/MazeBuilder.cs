@@ -19,6 +19,7 @@ namespace BallRolling.Gameplay
         public Material Floor;
         public Material EntranceMarker;
         public Material ExitMarker;
+        public Material Item;
     }
 
     /// <summary>ランタイム用の迷路ビルダー。配置・寸法は Step2_SceneMazeBuilder と完全一致させる（出口セル床なし・入り口セルのみ天井穴・壁下端0.1めり込み）。</summary>
@@ -29,13 +30,13 @@ namespace BallRolling.Gameplay
         private const float MarkerThickness = 0.05f;
         private const float MarkerLocalY = -1.2f;
 
-        /// <summary>root直下の Floor/Walls/Ceiling/Markers を破棄する（カメラ・玉など他の子は影響しない）。</summary>
+        /// <summary>root直下の Floor/Walls/Ceiling/Markers/Item を破棄する（カメラ・玉など他の子は影響しない）。</summary>
         public void Clear(Transform root)
         {
             if (root == null)
                 return;
 
-            var parentNames = new[] { "Floor", "Walls", "Ceiling", "Markers" };
+            var parentNames = new[] { "Floor", "Walls", "Ceiling", "Markers", "Item" };
             foreach (var parentName in parentNames)
             {
                 var child = root.Find(parentName);
@@ -51,6 +52,33 @@ namespace BallRolling.Gameplay
             BuildWalls(maze, geometry, root, materials.Wall);
             BuildCeiling(maze, geometry, root);
             BuildMarkers(maze, geometry, root, materials.EntranceMarker, materials.ExitMarker);
+        }
+
+        /// <summary>行き止まりから1箇所選び回転Cube+トリガーのアイテムを生成する。候補なし/失敗時は null。</summary>
+        public GameObject BuildItem(MazeModel maze, MazeGeometry geometry, Transform root,
+            float itemSize, float itemLocalY, Material material, int seed)
+        {
+            var cell = ItemPlacer.SelectCell(maze, new System.Random(seed));
+            if (cell == null)
+            {
+                Debug.LogWarning("ItemPlacer: 配置可能な行き止まりがないためアイテムを配置しません（ゲームは継続します）。");
+                return null;
+            }
+
+            var itemParent = new GameObject("Item");
+            itemParent.transform.SetParent(root, false);
+
+            var item = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            item.name = "ItemPickup";
+            item.transform.SetParent(itemParent.transform, false);
+            item.transform.localPosition = new Vector3(
+                (cell.Value.x + 0.5f) * geometry.CellSize, itemLocalY, (cell.Value.y + 0.5f) * geometry.CellSize);
+            item.transform.localScale = new Vector3(itemSize, itemSize, itemSize);
+            item.GetComponent<Renderer>().sharedMaterial = material;
+            // 玉を物理的に妨げないトリガー。Rigidbodyは持たせない（静的トリガーへの玉側侵入で判定する）
+            item.GetComponent<Collider>().isTrigger = true;
+            item.AddComponent<ItemPickup>();
+            return item;
         }
 
         private static void BuildFloor(MazeModel maze, MazeGeometry g, Transform root, Material material)

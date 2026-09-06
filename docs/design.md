@@ -256,6 +256,142 @@ public class GameLoop
 5. Space: 迷路がランダム再生成（壁配置が変化）し、ボードの傾きが初期化、`PRESS SPACE` に戻る
 6. 放置してタイマー0 → `TIME UP` + `PRESS SPACE TO RESTART`、Spaceで再生成
 
+### Step 5 詳細設計（アイテムと評価画面）
+
+前提: Step 4 完了済み。GameController は `hasItem: false` 固定で ScoreCalculator を呼んでおり、Step 5 はここに `_hasItem` を接続し、アイテム配置・取得・ItemIndicator 表示を追加する。**初回プレイは Step2 が生成したシーン内迷路を使う（GameController.Awake では再生成しない）ため、アイテムはランタイム MazeBuilder と Step2_SceneMazeBuilder の両方で生成する**（配置選択ロジックは共有の純粋C#に切り出す）。
+
+#### ファイル構成（Step 5 成果物）
+
+```
+Assets/Scripts/
+├── Logic/ItemPlacer.cs        … 行き止まりからアイテム配置セルを選ぶ純粋C#（EditModeテスト対象）
+└── ItemPickup.cs              … トリガー取得・回転表示（MonoBehaviour）
+Assets/Editor/
+├── Step5_PlayParameters.cs    … Step5の調整パラメータ（Serializable）
+├── Step5_ItemSetup.cs         … タグ設定・ItemIndicator生成・GameController配線（Undo対応）
+└── Step5_ItemSetupWindow.cs   … EditorWindow（MenuItem "BallRolling/Step5 Item"）
+Assets/Tests/EditMode/ItemPlacerTests.cs
+```
+
+#### 純粋ロジック: ItemPlacer（Logic/、名前空間 BallRolling.Gameplay.Logic）
+
+```csharp
+public static class ItemPlacer
+{
+    /// <summary>出口セルを通行不能とした到達探索で、入り口から到達可能な行き止まりのリストを返す。</summary>
+    public static List<Vector2Int> FindReachableDeadEnds(MazeModel maze);
+
+    /// <summary>到達可能な行き止まりから乱数で1つ選ぶ。候補が空なら null（アイテムなしでゲーム継続）。</summary>
+    public static Vector2Int? SelectCell(MazeModel maze, System.Random random);
+}
+```
+
+- 乱数は `System.Random` 注入（MazeGenerator と同じパターン。テスト再現性）
+- 除外根拠: 入り口セルは玉の落下地点・天井穴がある、出口セルは床が無くアイテムが落下する。いずれも配置不可
+- **出口セルは通行不能として扱う**: 出口の床は穴であり、経路が出口を経由するセルは玉が落入してゴールするしかない（=物理的に到達不能）。実測では全迷路の66.5%に出口経由でしか行けない行き止まりが存在し、13.4%の行き止まりが該当するため、到達探索（BFS）で入り口から出口を通らず到達可能な行き止まりのみを候補とする
+- 候補が空の場合はアイテムを配置せず警告ログのみ（ゲーム不能にしないため null 許容）
+
+#### ItemPickup（MonoBehaviour、Assets/Scripts/ItemPickup.cs）
+
+- **玉タグ判定**: `other.CompareTag("Ball")`（タグ "Ball" は Step5_ItemSetup で TagManager に登録・玉へ設定）
+- `OnTriggerEnter(Collider other)`: Ballタグ成立時 → `GameController.NotifyItemPicked()` 呼び出し → `Destroy(gameObject)`
+- **GameController参照方式**: 直接参照ではなく**取得時に遅延解決**（`FindFirstObjectByType&lt;GameController&gt;()` をキャッシュ）。理由: アイテムは (a) Step2 によるエディター生成 と (b) MazeBuilder によるランタイム再生成 の2経路があり、生成側が GameController を知らない。シーン内に GameController は必ず1つ（Step4構築物）のためこれで十分
+- `Update()`: `transform.Rotate(0f, rotationSpeed * Time.deltaTime, 0f)`（トリガーは静的コライダーで物理応答しないため transform 回転で安全）
+- SerializedField: `_rotationSpeedDegrees`（デフォルト90）
+
+コライダー設定: `GameObject.CreatePrimitive(Cube)` の BoxCollider を `isTrigger = true`（玉を物理的に妨げない）。 Rigidbody は持たせない。
+
+#### MazeBuilder 拡張（ランタイム）
+
+- `Clear`: 破棄対象親に `"Item"` を追加（Floor/Walls/Ceiling/Markers/Item の5つ）
+- `MazeMaterials` 構造体に `Material Item` を追加
+- 新規メソッド:
+```csharp
+/// <summary>行き止まりから1箇所選び回転Cube+トリガーのアイテムを生成。候補なし/失敗時は null。</summary>
+public GameObject BuildItem(MazeModel maze, MazeGeometry geometry, Transform root,
+    float itemSize, float itemLocalY, Material material, int seed)
+```
+  - 内部で `MazeGenerator.FindDeadEnds(maze)` → `ItemPlacer.SelectCell(..., new System.Random(seed))` → 親 `"Item"`（MazeRoot直下）配下に `ItemPickup` 付きCube生成
+  - ローカル座標: `((cell.x+0.5)*cellSize, itemLocalY, (cell.y+0.5)*cellSize)`、`localScale = (itemSize, itemSize, itemSize)`
+  - ジオメトリ一貫性: 床上面=0、玉直径0.8、天井下面=WallHeight-0.2(=1.0)。`itemSize=0.3 / itemLocalY=0.35` なら天井と干渉せず玉中心(約0.4)と重なり得る
+
+#### Step2_SceneMazeBuilder への追加
+
+- `Step2_SceneMazeBuilder.Build` の末尾で `MazeBuilder.BuildItem` と等価の生成を行う（エディター側は生成後に `Undo.RegisterCreatedObjectUndo` を呼ぶため、生成ロジックのみ共有しこちらで登録）
+- 既存シーンの迷路にアイテムを足すには Step2 ウィンドウの再実行が必要（Step5ウィンドウのHelpBoxに明記）
+
+#### GameController 拡張
+
+**Serializedフィールド追加**:
+
+| フィールド | 型 | デフォルト | 備考 |
+|---|---|---|---|
+| `_itemIndicatorText` | UnityEngine.UI.Text | — | UI Canvas配下（Step5_ItemSetupで配線） |
+| `_itemSize` | float | 0.3 | |
+| `_itemLocalY` | float | 0.35 | 床上面=0基準 |
+| `_itemRotationSpeedDegrees` | float | 90 | |
+| `_itemMaterial` | Material | — | 未設定なら金色で実行時生成（フォールバック） |
+
+**ロジック変更**:
+- private `bool _hasItem` 追加
+- `public void NotifyItemPicked()`: `Phase == Playing` guard付きで `_hasItem = true`、`_itemIndicatorText.text = "ITEM GET!"`
+- `CheckGoal`: `ScoreCalculator.Calculate(ElapsedSeconds, hasItem: _hasItem)` に変更（★表示は既存の MessageText 出力をそのまま使用）
+- `StartPlay`: `_hasItem = false` リセット + ItemIndicator テキスト消去
+- `RegenerateMaze`: `Build` 後に `_builder.BuildItem(_currentMaze, CreateGeometry(), _mazeRoot, _itemSize, _itemLocalY, ResolveMaterials().Item, UnityEngine.Random.Range(int.MinValue, int.MaxValue))` を追加（迷路と別シード。要件#3「リスタート毎ランダム」に準拠）
+- `ResolveMaterials` に Item を追加（`_itemMaterial` 参照優先、フォールバック色は gold `(1.0, 0.8, 0.1)`）
+
+#### UI（ItemIndicator）
+
+- **Stars は Step 4 実装の通り MessageText 内の★文字列を使い続ける**（UI Canvasへ新規StarsTextは作らない。二重表示防止とStep4実装の最小変更）
+- `ItemIndicatorText`: 新規Text、**左上アンカー**（anchorMin/Max=(0,1)、pivot=(0,1)、anchoredPosition=(20,-20)）。待機中・未取得は空文字、取得時 `ITEM GET!`（金色、fontSize 36）
+- Goal/TimeUp時の ItemIndicator は消去しない（★に反映済みのため取得事実を示す方が良い）
+
+#### エディターツール（Step5_、Assets/Editor/）
+
+**Step5_PlayParameters**（Serializable）: `ItemSize=0.3`、`ItemLocalY=0.35`、`ItemRotationSpeedDegrees=90`、`ItemColor=(1.0,0.8,0.1)`、`ItemIndicatorFontSize=36`、`ItemIndicatorColor`（金）、`ItemIndicatorText="ITEM GET!"`
+
+**Step5_ItemSetup.Apply(p)**（static）:
+1. MazeRoot / Ball（Step3_PlaySetup.BallName）/ UICanvas・GameController（Step4の定数）の存在チェック → 不足時エラーログ＋null返し
+2. **"Ball" タグ登録**: `SerializedObject(AssetDatabase.LoadAllAssetsAtPath("ProjectSettings/TagManager.asset")[0])` の tags 配列へ追加（無ければ）→ `EditorUtility.SetDirty`。**タグ登録前に `ball.tag = "Ball"` を設定すると例外が出るため必ず登録が先**
+3. 玉へタグ設定: `Undo.RecordObject(ballTransform, ...)` → `ball.tag = "Ball"`
+4. ItemIndicatorText 生成（UICanvas配下、左上アンカー）: `Undo.RegisterCreatedObjectUndo`
+5. GameController へ配線: SerializedObject で `_itemIndicatorText` `_itemSize` `_itemLocalY` `_itemRotationSpeedDegrees` `_itemMaterial` を設定 → `ApplyModifiedProperties` + `EditorUtility.SetDirty`
+6. アイテム用マテリアル: `Assets/Art/Materials/ItemGold.mat` を LoadAssetAtPath、無ければ新規作成して AssetDatabase.CreateAsset
+7. `EditorSceneManager.MarkSceneDirty`
+
+**Step5_ItemSetupWindow**（MenuItem "BallRolling/Step5 Item"）: パラメータUI＋「アイテム表示を構築」ボタン＋手順HelpBox（**シーン内迷路へのアイテム配置は Step2 ウィンドウの再実行が必要**と明記）。
+
+#### 設計判断の確定事項（メイン判断）
+
+- Stars は独立Textにせず MessageText 内の★文字列を維持（最小変更・二重表示防止）
+- 初回プレイは Step2 シーン迷路を使用（GameController.Awake での再生成は行わない。Step4設計を維持）。アイテム生成は Step2 とランタイム MazeBuilder の両方に実装
+- ItemIndicator は Goal/TimeUp 後も表示維持（★に反映済みだが取得事実を示す）
+- アイテムのシードは迷路シードと独立の乱数（リスタート毎ランダム）
+
+#### 既知の落とし穴への対応
+
+- **同一フレーム競合（Step4の教訓）**: ItemPickup.OnTriggerEnter は物理ステップで発火するが、GameControllerへの通知は**boolフラグ書き込みのみ**（transform同期を含まない）のため、Update の CheckGoal との順序競合は発生しない。物理コールバックは Update より前に走るため、同一フレームで取得→ゴールでも評点に反映される
+- アイテム取得判定は玉（Rigidbody）が静的トリガーへ侵入する形式なので、玉側に処理を書かない（玉のスクリプトを汚さない）
+- `Destroy`（ランタイム）と `Undo.DestroyObjectImmediate`（エディター）の使い分けは Step4 と同じ規約
+- アイテムの回転は transform.Rotate で直接回してよい（トリガーコライダーは物理応答しない。Step3の「静的コライダーをTransformで回すとすり抜ける」教訓は非トリガーのコライダーの話であり、トリガー判定は回転しても侵入検出に影響しない）
+
+#### テスト計画（EditMode: ItemPlacerTests）
+
+- 入り口・出口が行き止まり候補に含まれていても結果から除外される
+- **出口セルを経由しないと到達できない行き止まりは候補から除外される**（出口より奥に行き止まりがある迷路パターンで、そのセルが選ばれないことを乱数試行で確認）
+- seed 再現性（同 seed → 同セル）
+- 候補が空（到達可能な行き止まりなし）→ null
+- 候補1つ → 常にそのセル
+- ScoreCalculator のアイテム有無は既存テストで網羅済み（回帰: hasItem=true で+1）
+
+#### プレイモードでの動作確認手順
+
+1. Step2 で迷路（アイテム付き）再生成 → Step3 → Step4 → Step5 構築 → Ctrl+S
+2. プレイ開始: 左上に ItemIndicator 非表示、行き止まりに金色の回転Cube
+3. 玉をアイテムへ転がす → Cube消滅 + `ITEM GET!` 表示
+4. 出口へ落下 → ★にアイテム分が加算（時間ボーナスと合算で最大★★★）
+5. Space リスタート → 迷路再生成でアイテムも再配置（位置変化）、`_hasItem` リセット・ItemIndicator 消去
+
 ### 進捗の更新ルール
 
 - Step完了時に「状態」列を更新し、設計との差異があれば該当セクションも合わせて修正する

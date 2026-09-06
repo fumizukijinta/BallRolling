@@ -45,6 +45,9 @@ namespace BallRolling.EditorTools
 
             var ball = GameObject.CreatePrimitive(PrimitiveType.Sphere);
             ball.name = BallName;
+            // 再生成時も ItemPickup の CompareTag("Ball") が通るよう、毎回タグを設定する
+            Step5_ItemSetup.RegisterBallTag();
+            ball.tag = Step5_ItemSetup.BallTagName;
             ball.transform.SetParent(root, false);
             ball.transform.localPosition = entrance;
             ball.transform.localScale = Vector3.one * p.BallSize;

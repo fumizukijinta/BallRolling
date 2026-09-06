@@ -25,18 +25,25 @@ namespace BallRolling.Gameplay
         [SerializeField] private Material _floorMaterial;
         [SerializeField] private Material _entranceMarkerMaterial;
         [SerializeField] private Material _exitMarkerMaterial;
+        [SerializeField] private Text _itemIndicatorText;
+        [SerializeField] private float _itemSize = 0.3f;
+        [SerializeField] private float _itemLocalY = 0.35f;
+        [SerializeField] private float _itemRotationSpeedDegrees = 90f;
+        [SerializeField] private Material _itemMaterial;
 
         // フォールバックマテリアルの色（Step2_MazeBuildParameters の既定値と同値）
         private static readonly Color WallColor = new Color(0.75f, 0.75f, 0.8f);
         private static readonly Color FloorColor = new Color(0.55f, 0.6f, 0.65f);
         private static readonly Color EntranceColor = new Color(0.2f, 0.85f, 0.3f);
         private static readonly Color ExitColor = new Color(0.9f, 0.25f, 0.25f);
+        private static readonly Color ItemColor = new Color(1f, 0.8f, 0.1f);
 
         private GameLoop _loop;
         private MazeBuilder _builder;
         private MazeModel _currentMaze;
         private MazeMaterials? _resolvedMaterials;
         private string _lastTimerText;
+        private bool _hasItem;
 
         private void Awake()
         {
@@ -76,8 +83,23 @@ namespace BallRolling.Gameplay
                 CheckGoal();
         }
 
+        /// <summary>アイテム取得の通知（ItemPickup から呼ばれる）。物理ステップで発火するが bool 書き込みのみのため CheckGoal との順序競合はない。</summary>
+        public void NotifyItemPicked()
+        {
+            if (_loop == null || _loop.Phase != GamePhase.Playing)
+                return;
+
+            _hasItem = true;
+            if (_itemIndicatorText != null)
+                _itemIndicatorText.text = "ITEM GET!";
+        }
+
         private void StartPlay()
         {
+            _hasItem = false;
+            if (_itemIndicatorText != null)
+                _itemIndicatorText.text = string.Empty;
+
             SpawnBall();
             _loop.StartGame();
             SetBoardInputEnabled(true);
@@ -153,7 +175,7 @@ namespace BallRolling.Gameplay
             _ball.SetActive(false); // ゴール後は即非表示（落下演出なし）
             SetBoardInputEnabled(false);
 
-            var score = ScoreCalculator.Calculate(_loop.ElapsedSeconds, hasItem: false);
+            var score = ScoreCalculator.Calculate(_loop.ElapsedSeconds, hasItem: _hasItem);
             if (_messageText != null)
                 _messageText.text = ScoreCalculator.RenderStars(score) + "\nPRESS SPACE TO RESTART";
         }
@@ -173,6 +195,16 @@ namespace BallRolling.Gameplay
 
             _builder.Clear(_mazeRoot);
             _builder.Build(_currentMaze, CreateGeometry(), _mazeRoot, ResolveMaterials());
+
+            // アイテムは迷路と別シードでランタイム再配置（要件: リスタート毎ランダム）
+            var item = _builder.BuildItem(_currentMaze, CreateGeometry(), _mazeRoot, _itemSize, _itemLocalY,
+                ResolveMaterials().Item, UnityEngine.Random.Range(int.MinValue, int.MaxValue));
+            if (item != null)
+            {
+                var pickup = item.GetComponent<ItemPickup>();
+                if (pickup != null)
+                    pickup.RotationSpeedDegrees = _itemRotationSpeedDegrees;
+            }
 
             var board = _mazeRoot != null ? _mazeRoot.GetComponent<BoardController>() : null;
             if (board != null)
@@ -201,7 +233,8 @@ namespace BallRolling.Gameplay
                 Wall = _wallMaterial != null ? _wallMaterial : CreateRuntimeMaterial(WallColor),
                 Floor = _floorMaterial != null ? _floorMaterial : CreateRuntimeMaterial(FloorColor),
                 EntranceMarker = _entranceMarkerMaterial != null ? _entranceMarkerMaterial : CreateRuntimeMaterial(EntranceColor),
-                ExitMarker = _exitMarkerMaterial != null ? _exitMarkerMaterial : CreateRuntimeMaterial(ExitColor)
+                ExitMarker = _exitMarkerMaterial != null ? _exitMarkerMaterial : CreateRuntimeMaterial(ExitColor),
+                Item = _itemMaterial != null ? _itemMaterial : CreateRuntimeMaterial(ItemColor)
             };
             _resolvedMaterials = materials;
             return materials;
