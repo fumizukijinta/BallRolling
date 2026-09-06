@@ -18,6 +18,9 @@ namespace BallRolling.Gameplay
 
         private void FixedUpdate()
         {
+            // ボードの傾きによらず転がり始めるよう、スリープを防ぐ
+            _rigidbody.WakeUp();
+
             var velocity = _rigidbody.linearVelocity;
             if (velocity.sqrMagnitude > _maxLinearSpeed * _maxLinearSpeed)
                 _rigidbody.linearVelocity = velocity.normalized * _maxLinearSpeed;

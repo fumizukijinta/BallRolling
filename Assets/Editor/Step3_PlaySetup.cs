@@ -147,7 +147,9 @@ namespace BallRolling.EditorTools
             physicMaterial.dynamicFriction = p.Friction;
             physicMaterial.staticFriction = p.Friction;
             physicMaterial.bounciness = p.Bounciness;
-            physicMaterial.frictionCombine = PhysicsMaterialCombine.Maximum;
+            // Minimum: 床（素のコライダー摩擦0.6）との組み合わせで玉側の低摩擦を採用するため。
+            // Maximum にすると床側0.6が勝ち、傾き15度（tan15°=0.27）では静止摩擦に阻まれて転がり始めない。
+            physicMaterial.frictionCombine = PhysicsMaterialCombine.Minimum;
             physicMaterial.bounceCombine = PhysicsMaterialCombine.Maximum;
             EditorUtility.SetDirty(physicMaterial);
             AssetDatabase.SaveAssets();
