@@ -109,7 +109,7 @@ GameScene
 | 2 | 迷路生成エディターツール | MazeBuilderWindow（パラメータUI・生成/再生成・Undo対応・シーンdirty化）、Cell[,]から壁・板をシーンへ生成 | `Assets/Editor/Step2_*` | 完了 |
 | 3 | プレイ環境の構築 | 玉（Sphere+Rigidbody+PhysicMaterial）、BoardController（傾け・カメラはMazeRootの子）、物理調整（トンネリング・壁越え対策・透明な天井・入り口の天井穴） | `Assets/Editor/Step3_*` + GameScene | 完了 |
 | 4 | ゲームループの実装 | GameController状態マシン（WaitingToStart/Playing/Goal/TimeUp）: Space開始（玉spawn・タイマー180s開始）、ゴール判定（出口からの落下）、タイムアップ、Spaceで迷路再生成。UI（Timer / Message）更新 | `Assets/Scripts/GameController.cs` + UI Canvas | 完了 |
-| 5 | アイテムと評価画面 | 行き止まりから入り口・出口を除き乱数で1箇所へアイテム配置、ItemPickup（トリガー取得）、ScoreCalculator評価の★表示（最大★★★）+ ItemIndicator | `Assets/Scripts/ItemPickup.cs`、Stars表示、ScoreCalculator接続 | 未着手 |
+| 5 | アイテムと評価画面 | 行き止まりから入り口・出口を除き乱数で1箇所へアイテム配置、ItemPickup（トリガー取得）、ScoreCalculator評価の★表示（最大★★★）+ ItemIndicator | `Assets/Scripts/ItemPickup.cs`、Stars表示、ScoreCalculator接続 | 完了 |
 | 6 | 調整と仕上げ | 通し動作確認（`editor_play` + `capture_game_view`）、物理パラメータ・UI・難易度調整、EditModeテスト全緑・`unity build` 検証 | 調整済みGameScene、全テスト緑、ビルド成功 | 未着手 |
 
 ### 各Stepの依存関係
