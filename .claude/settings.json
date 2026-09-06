@@ -26,34 +26,7 @@
       "PowerShell(unity open:*)",
       "Bash(unity open:*)",
       "PowerShell(unity close:*)",
-      "Bash(unity close:*)",
-      "Bash(python -c \"import sys,json; d=json.load\\(sys.stdin\\); [print\\(l['type'],'|',l['message'][:80]\\) for l in d['logs']]\")",
-      "Bash(curl -s -m 10 -X POST http://localhost:7800/eval -H \"Content-Type: application/json\" -d \"{\\\\\"token\\\\\":\\\\\"22zRb7IbKf1dgCj5y2JGYo6jQQnYqKUZfLDq1dLWAtk=\\\\\",\\\\\"code\\\\\":\\\\\"var ball = GameObject.Find\\(\\\\\\\\\\\\\"Ball\\\\\\\\\\\\\"\\);var sb=new System.Text.StringBuilder\\(\\);sb.AppendLine\\($\\\\\\\\\\\\\"Ball={\\(ball?ball.name:\\\\\\\\\\\\\"NULL\\\\\\\\\\\\\"\\)} tag={\\(ball?ball.tag:\\\\\\\\\\\\\"-\\\\\\\\\\\\\"\\)} active={\\(ball?ball.activeInHierarchy.ToString\\(\\):\\\\\\\\\\\\\"-\\\\\\\\\\\\\"\\)}\\\\\"\\);if\\(ball\\){var rb=ball.GetComponent<Rigidbody>\\(\\);sb.AppendLine\\($\\\\\\\\\\\\\"Ball rb={\\(rb!=null\\)} vel={\\(rb!=null?rb.linearVelocity.ToString\\(\\):\\\\\\\\\\\\\"-\\\\\\\\\\\\\"\\)}\\\\\"\\);sb.AppendLine\\($\\\\\\\\\\\\\"Ball parent={\\(ball.transform.parent?ball.transform.parent.name:\\\\\\\\\\\\\"none\\\\\\\\\\\\\"\\)}\\\\\"\\);}var items=Object.FindObjectsByType<BallRolling.Gameplay.ItemPickup>\\(FindObjectsInactive.Include,FindObjectsSortMode.None\\);sb.AppendLine\\($\\\\\\\\\\\\\"ItemPickup count={items.Length}\\\\\"\\);foreach\\(var it in items\\){var c=it.GetComponent<Collider>\\(\\);sb.AppendLine\\($\\\\\\\\\\\\\" item={it.name} trigger={\\(c!=null?c.isTrigger.ToString\\(\\):\\\\\\\\\\\\\"NO-COLLIDER\\\\\\\\\\\\\"\\)} pos={it.transform.position} active={it.gameObject.activeInHierarchy} enabled={it.enabled}\\\\\"\\);}var gcs=Object.FindObjectsByType<BallRolling.Gameplay.GameController>\\(FindObjectsInactive.Include,FindObjectsSortMode.None\\);sb.AppendLine\\($\\\\\\\\\\\\\"GameController count={gcs.Length}\\\\\"\\);Debug.Log\\(sb.ToString\\(\\)\\);return sb.ToString\\(\\);\\\\\"}\")",
-      "Bash(curl -s -m 10 -X POST http://localhost:7800/eval -H \"Content-Type: application/json\" -H \"Authorization: Bearer 22zRb7IbKf1dgCj5y2JGYo6jQQnYqKUZfLDq1dLWAtk=\" -d \"{\\\\\"code\\\\\":\\\\\"return \\\\\\\\\\\\\"ok\\\\\\\\\\\\\";\\\\\"}\")",
-      "Bash(curl -s -m 10 http://localhost:7800/ -H \"Authorization: Bearer 22zRb7IbKf1dgCj5y2JGYo6jQQnYqKUZfLDq1dLWAtk=\")",
-      "Bash(tasklist //FI \"PID eq 18628\")",
-      "Bash(grep -n \"m_Name: \\\\\\(MazeRoot\\\\|Floor\\\\|Walls\\\\|Ceiling\\\\|Markers\\\\|Item\\\\|EntranceMarker\\\\|ExitMarker\\\\|Main Camera\\\\|Canvas\\\\|EventSystem\\\\\\)\" \"c:/Unity/project/BallRolling/Assets/Scenes/SampleScene.unity\" | head -20; echo \"== file mtime ==\"; stat -c \"%y\" \"c:/Unity/project/BallRolling/Assets/Scenes/SampleScene.unity\"; echo \"== git log scene ==\"; cd \"c:/Unity/project/BallRolling\" && git log --oneline -3 -- Assets/Scenes/SampleScene.unity && git status --short Assets/Scenes/SampleScene.unity)",
-      "Read(//c/Unity/project/BallRolling/**)",
-      "Bash(grep -n \"m_Name: \\\\\\(MazeRoot\\\\|Item\\\\|Floor\\\\|Walls\\\\|Ceiling\\\\|Markers\\\\\\)$\" \"c:/Unity/project/BallRolling/Assets/Scenes/SampleScene.unity\")",
-      "Bash(cd \"c:/Unity/project/BallRolling/Logs\" && wc -l Editor.log Editor-prev.log && grep -n \"Step4\\\\|Step5\\\\|Entering Play\\\\|Exiting Play\\\\|Saving Scene\\\\|scene saved\\\\|Opened scene\\\\|ITEM\\\\|item\" Editor.log | head -30; echo \"== prev mtime ==\"; stat -c %y Editor-prev.log)",
-      "Bash(grep -v \"^$\")",
-      "Bash(curl -s -m 15 -X POST http://localhost:7800/eval -H \"Content-Type: application/json\" -d \"{\\\\\"token\\\\\":\\\\\"22zRb7IbKf1dgCj5y2JGYo6jQQnYqKUZfLDq1dLWAtk=\\\\\",\\\\\"code\\\\\":\\\\\"var ball = GameObject.Find\\(\\\\\\\\\\\\\"Ball\\\\\\\\\\\\\"\\);var sb=new System.Text.StringBuilder\\(\\);sb.AppendLine\\($\\\\\\\\\\\\\"Ball={\\(ball?\\\\\\\\\\\\\"found\\\\\\\\\\\\\":\\\\\\\\\\\\\"NULL\\\\\\\\\\\\\"\\)} tag={\\(ball?ball.tag:\\\\\\\\\\\\\"-\\\\\\\\\\\\\"\\)} parent={\\(ball&&ball.transform.parent?ball.transform.parent.name:\\\\\\\\\\\\\"none\\\\\\\\\\\\\"\\)}\\\\\"\\);var items=Object.FindObjectsByType<BallRolling.Gameplay.ItemPickup>\\(FindObjectsInactive.Include,FindObjectsSortMode.None\\);sb.AppendLine\\($\\\\\\\\\\\\\"ItemPickup count={items.Length}\\\\\"\\);foreach\\(var it in items\\){var c=it.GetComponent<Collider>\\(\\);sb.AppendLine\\($\\\\\\\\\\\\\" item={it.name} trigger={\\(c!=null?c.isTrigger.ToString\\(\\):\\\\\\\\\\\\\"NO-COLLIDER\\\\\\\\\\\\\"\\)} pos={it.transform.position.ToString\\(\\\\\\\\\\\\\"F2\\\\\\\\\\\\\"\\)} active={it.gameObject.activeInHierarchy}\\\\\"\\);}Debug.Log\\(sb.ToString\\(\\)\\);return sb.ToString\\(\\);\\\\\"}\")",
-      "Bash(grep -o '\"evalToken\": \"[^\"]*\"' \"c:/Unity/project/BallRolling/Library/Pipeline/.unity-pipeline-port\"; stat -c %y \"c:/Unity/project/BallRolling/Library/Pipeline/.unity-pipeline-port\")",
-      "Bash(unity --help)",
-      "Read(//tmp/**)",
-      "Bash(grep -n \"m_Name: ItemPickup\\\\|m_Name: Item$\\\\|m_Name: MazeRoot\\\\|m_Name: Ball\" Assets/Scenes/SampleScene.unity)",
-      "Bash(python -c \"print\\('ok'\\)\")",
-      "Bash(py -c \"print\\('ok'\\)\")",
-      "Bash(awk 'NR>=24610 && NR<=24630' Assets/Scenes/SampleScene.unity)",
-      "Bash(awk '/^--- !u!4 &1658188144/,/^--- !u!1[0-9]/' Assets/Scenes/SampleScene.unity)",
-      "Bash(sed -i 's|            var cell = ItemPlacer.SelectCell\\(\\\\n                MazeGenerator.FindDeadEnds\\(maze\\), maze.Entrance, maze.Exit, new System.Random\\(seed\\)\\);||' /dev/null)",
-      "Bash(grep -c \"Asset Pipeline Refresh\" \"C:\\\\Unity\\\\project\\\\BallRolling\\\\Logs\\\\Editor.log\"; stat -c '%y %s' \"C:\\\\Unity\\\\project\\\\BallRolling\\\\Logs\\\\Editor.log\"; tail -c 1500 \"C:\\\\Unity\\\\project\\\\BallRolling\\\\Logs\\\\Editor.log\" | grep -v memorysetup | tail -12)",
-      "Bash(powershell -NoProfile -Command ' *)",
-      "Bash(unity open *)",
-      "Bash(unity test *)"
-    ],
-    "additionalDirectories": [
-      "\\dev"
+      "Bash(unity close:*)"
     ]
   }
 }
