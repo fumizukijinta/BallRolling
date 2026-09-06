@@ -61,8 +61,8 @@ namespace BallRolling.EditorTools
 
             var limiter = ball.GetComponent<BallSpeedLimiter>();
             if (limiter == null)
-                ball.AddComponent<BallSpeedLimiter>();
-            ball.GetComponent<BallSpeedLimiter>().Configure(p.MaxLinearSpeed, p.MaxAngularSpeed);
+                limiter = ball.AddComponent<BallSpeedLimiter>();
+            limiter.Configure(p.MaxLinearSpeed, p.MaxAngularSpeed);
 
             Undo.RegisterCreatedObjectUndo(ball, "Step3: Spawn Ball");
             return ball;
