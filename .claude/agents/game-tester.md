@@ -20,7 +20,8 @@ model: glm-5.3-flash
 2. **玉の転送は必ず `Rigidbody.position` で行う**（`transform.localPosition` の直接書き換えでは物理ボディが移動しない）
 3. **内部メソッドの反射呼び出しは公開メソッド相当（`StartPlay`/`RestartGame` 等）を経由する**（内部処理だけ呼ぶとUI更新等がスキップされて偽の失敗に見える）
 4. **フレーム停止（frameCount不変）時はUnityウィンドウのフォーカスをユーザーに依頼する**（autotickはプレイモード中は当てにできない）
-5. 確認後は必ず `editor_stop` でプレイモードを抜ける
+5. **ゴール→リスタート→開始のフルサイクルは「同一フレーム競合」を再現すること**: eval 内で `StartPlay()` の反射呼び出し直後に（sleepや別evalを挟まず）`CheckGoal()` 相当を連続評価する。物理同期を挟むと実プレイの「Update内連続実行」を再現できず偽陽性になる（実例: SpawnBallのrb.position書き込み後に同フレームで古いtransformを読むバグを見逃した）
+6. 確認後は必ず `editor_stop` でプレイモードを抜ける
 
 ## 必ず守ること
 

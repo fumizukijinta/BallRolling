@@ -101,15 +101,29 @@ namespace BallRolling.Gameplay
 
             _ball.SetActive(true);
             var entrance = _currentMaze != null ? _currentMaze.Entrance : Vector2Int.zero;
-            _ball.transform.localPosition = new Vector3(
+            var spawnLocalPosition = new Vector3(
                 (entrance.x + 0.5f) * _cellSize, _ballSpawnHeight, (entrance.y + 0.5f) * _cellSize);
 
             var rigidbody = _ball.GetComponent<Rigidbody>();
             if (rigidbody != null)
             {
+                // Interpolate付きRigidbodyはtransform直接書き換えが物理ボディへ反映されないため position に書き込む
+                // localPosition基準の座標なので、親（MazeRoot・最大15°傾き）を経由してワールド座標へ変換する
+                var parent = _ball.transform.parent != null ? _ball.transform.parent : _mazeRoot;
+                var spawnWorldPosition = parent != null
+                    ? parent.TransformPoint(spawnLocalPosition)
+                    : spawnLocalPosition;
+                rigidbody.position = spawnWorldPosition;
+                // Rigidbody.position の書き込みは transform へ即時反映されないため同一フレームで同期する
+                _ball.transform.position = spawnWorldPosition;
                 rigidbody.linearVelocity = Vector3.zero;
                 rigidbody.angularVelocity = Vector3.zero;
                 rigidbody.WakeUp();
+            }
+            else
+            {
+                // Rigidbodyが無い場合のフォールバック
+                _ball.transform.localPosition = spawnLocalPosition;
             }
         }
 
@@ -119,7 +133,11 @@ namespace BallRolling.Gameplay
                 return;
 
             // MazeRootは最大15°傾くため、判定はローカル座標で行う
-            var localPosition = _ball.transform.localPosition;
+            // 物理同期前の古いtransform参照を避けるため、Rigidbodyの実位置を優先して読む
+            var rigidbody = _ball.GetComponent<Rigidbody>();
+            var worldPosition = rigidbody != null ? rigidbody.position : _ball.transform.position;
+            var parent = _ball.transform.parent != null ? _ball.transform.parent : _mazeRoot;
+            var localPosition = parent != null ? parent.InverseTransformPoint(worldPosition) : worldPosition;
             if (localPosition.y >= _goalFallLocalY)
                 return;
 
