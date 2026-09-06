@@ -98,8 +98,25 @@ GameScene
 - FindDeadEnds: 既知パターンで正しい行き止まり集合
 - ScoreCalculator: 境界（59s/60s/61s/119s/120s/121s × アイテム有無）・最大3・星文字列
 
-## 実装フェーズ
-1. Logic + EditModeテスト（緑確認）
-2. シーン構築 + MazeBuilder + BoardController
-3. GameController（状態・UI・タイマー） + ItemPickup
-4. 通し動作確認（`capture_game_view` + `editor_play`）→ 調整
+## 実装ステップ計画（Step 1〜6）
+
+実装は「ユーザーがエディター/プレイで操作して確認できる単位」に分割する。各Stepの内容は本書の各セクション（純粋ロジック／エディターツール／Unity側／UI仕様）を参照。完了済みStepの詳細な作業記録は `C:\Unity\templates\lessons-learned.md` の各Stepセクション参照。
+
+| Step | 目的 | 主要内容 | 成果物 | 状態 |
+|---|---|---|---|---|
+| 1 | 迷路ロジックの確立 | MazeModel / MazeGenerator（再帰的バックトラッカー・seed注入）+ EditModeテスト（全セル到達・壁整合性・seed再現性） | `Assets/Scripts/Logic/` + `Assets/Tests/EditMode/` | 完了 |
+| 2 | 迷路生成エディターツール | MazeBuilderWindow（パラメータUI・生成/再生成・Undo対応・シーンdirty化）、Cell[,]から壁・板をシーンへ生成 | `Assets/Editor/Step2_*` | 完了 |
+| 3 | プレイ環境の構築 | 玉（Sphere+Rigidbody+PhysicMaterial）、BoardController（傾け・カメラはMazeRootの子）、物理調整（トンネリング・壁越え対策・透明な天井・入り口の天井穴） | `Assets/Editor/Step3_*` + GameScene | 完了 |
+| 4 | ゲームループの実装 | GameController状態マシン（WaitingToStart/Playing/Goal/TimeUp）: Space開始（玉spawn・タイマー180s開始）、ゴール判定（出口からの落下）、タイムアップ、Spaceで迷路再生成。UI（Timer / Message）更新 | `Assets/Scripts/GameController.cs` + UI Canvas | 未着手 |
+| 5 | アイテムと評価画面 | 行き止まりから入り口・出口を除き乱数で1箇所へアイテム配置、ItemPickup（トリガー取得）、ScoreCalculator評価の★表示（最大★★★）+ ItemIndicator | `Assets/Scripts/ItemPickup.cs`、Stars表示、ScoreCalculator接続 | 未着手 |
+| 6 | 調整と仕上げ | 通し動作確認（`editor_play` + `capture_game_view`）、物理パラメータ・UI・難易度調整、EditModeテスト全緑・`unity build` 検証 | 調整済みGameScene、全テスト緑、ビルド成功 | 未着手 |
+
+### 各Stepの依存関係
+
+- Step 4 は Step 1〜3 の成果物（迷路生成・シーン・玉）を利用する。Step 5 は Step 4 の状態マシン（Goal遷移での評価呼び出し）に依存する
+- Step 4 のアイテム未配置状態でもゲームループ自体は完結するよう、評価はアイテムなし（+0点）で動作する前提でStep 4を実装する
+
+### 進捗の更新ルール
+
+- Step完了時に「状態」列を更新し、設計との差異があれば該当セクションも合わせて修正する
+- 完了Stepの問題と解決は `lessons-learned.md` の該当Stepセクションへ記録する（CLAUDE.md規定）
